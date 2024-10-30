@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Heading, Text, UnorderedList, ListItem, Input, Button, Container, FormControl, FormLabel, Stack } from '@chakra-ui/react';
 import "@fontsource/pt-sans";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { login } from '../../actions/api';
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [userOrders, setUserOrders] = useState([]);
@@ -8,6 +11,9 @@ const UserProfile = () => {
   const [signupForm, setSignupForm] = useState({ email: '', password: '', mobile: '', name: '', dob: '' });
   const [showSignupForm, setShowSignupForm] = useState(false);
   const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,40 +53,22 @@ const UserProfile = () => {
     fetchData();
   }, [token]);
 
-
   const handleLogin = async () => {
     try {
-      // Make a POST request to your login API endpoint
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginForm),
-      });
-      console.log('Login Response:', response);
+      const response = await login(email, password);
+      console.log('Login Response:', response.data);
 
-      if (!response.ok) {
-        // Handle login error here, e.g., show an error message
-        console.error('Login failed:', response.status, await response.text());
-        return;
+      if (response.success === true) {
+        // Call onLogin(true) if authentication is successful
+        // onLogin(true);
+        navigate('/');
+      } else {
+        // Handle unsuccessful login (show error message, etc.)
+        console.error('Login failed:', response.data.message);
       }
-
-      const responseData = await response.json();
-
-      if (!responseData.token) {
-        // Handle missing token in the response
-        console.error('Token is missing in the login response');
-        return;
-      }
-
-      // Save the token in localStorage
-      localStorage.setItem('token', responseData.token);
-
-      // Update the state with the new token
-      setToken(responseData.token);
     } catch (error) {
-      console.error('Error during login:', error);
+      // Handle any errors that occur during the API call
+      console.error('Error during login:', error.message);
     }
   };
 
@@ -258,14 +246,18 @@ const UserProfile = () => {
                 <Input
                   type="email"
                   placeholder="Email"
-                  value={loginForm.email}
-                  onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                  // value={loginForm.email}
+                  // onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Input
                   type="password"
                   placeholder="Password"
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                  // value={loginForm.password}
+                  // onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   mt={2}
                 />
                 <Stack>

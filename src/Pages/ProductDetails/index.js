@@ -19,6 +19,7 @@ import {
 
 import { useToast } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
+import { addToCartt, addToWishlistt } from "../../actions/api";
 
 const ProductDetails = () => {
   const { productId } = useParams();
@@ -60,21 +61,9 @@ const ProductDetails = () => {
 
   const addToCart = async () => {
     try {
-      const response = await fetch("http://localhost:4000/cart/add-to-cart", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          productId,
-          quantity,
-          selectedSize,
-          selectedColor,
-        }),
-      });
+      const response = await addToCartt(productId, quantity, selectedColor);
 
-      if (!response.ok) {
+      if (!response.status === 200) {
         throw new Error(`Network response was not ok: ${response.status}`);
       }
 
@@ -95,10 +84,12 @@ const ProductDetails = () => {
     }
   };
 
-  const addToWishlist = () => {
+  const addToWishlist = async() => {
+    const response = await addToWishlistt(productId);
+    console.log(response);
     setIsAddedToWishlist(true);
     toast({
-      title: "Item added to wishlist",
+      title: response.data.message,
       status: "success",
       duration: 3000,
       isClosable: true,
@@ -151,7 +142,7 @@ const ProductDetails = () => {
               objectFit="contain"
               h="100%"
               w="100%"
-              onClick={() => {}}
+              onClick={() => { }}
               transition="transform 0.2s ease-in-out"
               _hover={{ transform: 'scale(1.3)' }}
               overflow='hidden'
@@ -185,32 +176,44 @@ const ProductDetails = () => {
             (incl. of all taxes)
           </Text>
 
-          <Text color="gray.600" mb="4">
-            Color:
-            <Select
-              value={selectedColor}
-              onChange={handleColorChange}
-              placeholder="Select Color"
-              size="md"
-              mt="2"
-            >
-              {product.variants.map((variant, index) => (
-                <option key={index} value={variant.color}>
-                  {variant.color}
-                </option>
-              ))}
-            </Select>
-          </Text>
+          <Box display="flex" alignItems="center" mb="4" w={"100%"}>
+            <Text color="gray.600" mb="4">
+              Color:
+              <Select
+                value={selectedColor}
+                onChange={handleColorChange}
+                placeholder="Select Color"
+                size="md"
+              // mt="2"
+              >
+                {product.variants.map((variant, index) => (
+                  <option key={index} value={variant.color}>
+                    {variant.color}
+                  </option>
+                ))}
+              </Select>
+            </Text>
 
-          <Text color="gray.600" mb="6">
-            Quantity:
-            <Input
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              min="1"
-            />
-          </Text>
+            <Text color="gray.600" mb="4">
+              Quantity:
+              <Select value={quantity} onChange={(e) => setQuantity(e.target.value)}>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+              </Select>
+              {/* <Input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                min="1"
+              /> */}
+            </Text>
+          </Box>
+
 
           <Button
             bg={"black"}
@@ -225,7 +228,7 @@ const ProductDetails = () => {
             w="full"
             isDisabled={!selectedColor}
           >
-            { !selectedColor ? "Select Size and Color" : "Add to Cart"}
+            {!selectedColor ? "Select Size and Color" : "Add to Cart"}
           </Button>
 
           <Button

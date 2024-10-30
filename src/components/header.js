@@ -19,18 +19,20 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { HamburgerIcon, Search2Icon } from "@chakra-ui/icons";
-import { FaUser, FaShoppingCart } from "react-icons/fa";
+import { FaUser, FaShoppingCart, FaRegHeart } from "react-icons/fa";
 import logo from "./logo.png";
 import ShoppingCartDrawer from "../components/cart"
+import WishlistDrawer from "./wishlist";
 const Header = () => {
 
 
   const [isOpen, setIsOpen] = React.useState(false);
   const [isCartOpen, setCartOpen] = React.useState(false);
+  const [isWishlistOpen, setWishlistOpen] = React.useState(false);
   const handleToggle = () => setIsOpen(!isOpen);
 
 
-  
+
   return (
     <Flex
       color="white"
@@ -60,9 +62,9 @@ const Header = () => {
             <DrawerContent>
               <DrawerCloseButton />
               <Link to="/profile">
-              <DrawerHeader>Login</DrawerHeader>
+                <DrawerHeader>Login</DrawerHeader>
               </Link>
-             
+
               <Divider />
               <DrawerBody>
                 {/* Add your sidebar content here */}
@@ -90,7 +92,12 @@ const Header = () => {
           isCartOpen={isCartOpen}
           setCartOpen={setCartOpen}
         />
-       
+
+        <WishlistDrawer
+          isWishlistOpen={isWishlistOpen}
+          setWishlistOpen={setWishlistOpen}
+        />
+
       </HStack>
 
       {/* Center (Logo) */}
@@ -103,9 +110,13 @@ const Header = () => {
       <Box display={"flex"}>
         <IconButton icon={<Search2Icon fontSize="xl" />} variant="ghost" />
         <Link to="/profile">
-        <IconButton icon={<FaUser fontSize="2xl" />} variant="ghost" />
+          <IconButton icon={<FaUser fontSize="2xl" />} variant="ghost" />
         </Link>
-        
+        <IconButton
+          icon={<FaRegHeart fontSize="2xl" />}
+          variant="ghost"
+          onClick={() => setWishlistOpen(!isWishlistOpen)}
+        />
         <IconButton
           icon={<FaShoppingCart fontSize="2xl" />}
           variant="ghost"

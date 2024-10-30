@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Drawer,
   DrawerOverlay,
@@ -6,8 +6,8 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   DrawerBody,
-  VStack,Heading,Box,Link, useColorModeValue as mode,Flex,
-  Input,Image,
+  VStack, Heading, Box, Link, useColorModeValue as mode, Flex,
+  Input, Image,
   Select,
   Button,
   Text,
@@ -32,6 +32,8 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { MdCheckCircle, MdLocationCity } from 'react-icons/md';
+import { getCart, removeFromCart } from '../actions/api';
+import { DeleteIcon } from '@chakra-ui/icons';
 
 const ShoppingCartDrawer = ({
   isCartOpen,
@@ -49,24 +51,29 @@ const ShoppingCartDrawer = ({
   const [isOrderModalOpen, setOrderModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  useEffect(() => {
-    const getCartData = async () => {
-      try {
-        const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
-        const response = await fetch('http://localhost:4000/cart/get-cart', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const cartData = await response.json();
-        setCartItems(cartData.items);
-        console.log(cartItems)
-      } catch (error) {
-        console.error('Error fetching cart data:', error);
-      }
-    };
+  const handleRemoveFromCart = async (itemId, color) => {
+    console.log('itemif', itemId, color);
+    try {
+      const response = await removeFromCart(itemId, color);
+      console.log('Response from removeFromCart:', response);
+      getCartData();
+    } catch (error) {
+      console.error('Error removing item from cart:', error);
+    }
+  };
 
+  const getCartData = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
+      const response = await getCart();
+      setCartItems(response.cartItems);
+      console.log(response.cartItems, 'getcartaaa');
+      console.log(cartItems)
+    } catch (error) {
+      console.error('Error fetching cart data:', error);
+    }
+  };
+  useEffect(() => {
     if (isCartOpen) {
       getCartData();
     }
@@ -107,7 +114,7 @@ const ShoppingCartDrawer = ({
   };
 
   const handleDone = () => {
-    if(phoneNumber &&  name && email && address &&  city && pincode){
+    if (phoneNumber && name && email && address && city && pincode) {
       const data = {
         "name": name,
         "email": email,
@@ -119,12 +126,12 @@ const ShoppingCartDrawer = ({
 
       const token = localStorage.getItem('token');
 
-// Set the Authorization header with the token
-const headers = {
-  Authorization: `Bearer ${token}`,
-};
+      // Set the Authorization header with the token
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
 
-      axios.post('http://localhost:4000/orders/checkout',data, {headers}).then(res => console.log(res)) .catch(error => {
+      axios.post('http://localhost:4000/orders/checkout', data, { headers }).then(res => console.log(res)).catch(error => {
         console.error(error);
       });
     }
@@ -182,24 +189,25 @@ const headers = {
                           borderColor="gray.200"
                         >
                           <Image
-                            src={`http://localhost:4000${item.productId.image[0]}`}
-                            alt={item.productId.name}
+                            src={`http://localhost:5000/uploads${item.product.images[0]}`}
+                            alt={item.product.name}
                             boxSize="80px"
                             objectFit="cover"
                           />
                           <Stack flex="1">
                             <Text fontSize="md" fontWeight="bold">
-                              {item.productId.name}
+                              {item.product.name}
                             </Text>
                             <Text fontSize="xs">
-                              Color: {item.selectedColor}
+                              Color: {item.color}
                             </Text>
-                            <Text fontSize="xs">Size: {item.selectedSize}</Text>
+                            {/* <Text fontSize="xs">Size: {item.selectedSize}</Text> */}
                             <Text fontSize="xs">Quantity: {item.quantity}</Text>
                           </Stack>
-                          <Stack marginTop={20}>
+                          <Stack display={"flex"} mt={18} alignItems="end" gap={2}>
+                            <DeleteIcon onClick={() => handleRemoveFromCart(item.product._id, item.color)} cursor="pointer" />
                             <Text fontSize="xs" fontWeight="bold">
-                              Price: ${item.productId.price}
+                              Price: ${item.currentPrice}
                             </Text>
                           </Stack>
                         </HStack>
