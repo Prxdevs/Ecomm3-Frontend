@@ -29,6 +29,7 @@ import {
   TabList,
   TabPanel,
   TabPanels,
+  useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { MdCheckCircle, MdLocationCity } from 'react-icons/md';
@@ -50,8 +51,9 @@ const WishlistDrawer = ({
   const [pincode, setPincode] = useState('');
   const [isOrderModalOpen, setOrderModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const toast = useToast();
 
-  const handleRemoveFromCart = async (itemId ) => {
+  const handleRemoveFromCart = async (itemId) => {
     console.log('itemif', itemId);
     try {
       const response = await removeFromWishlist(itemId);
@@ -68,9 +70,14 @@ const WishlistDrawer = ({
       const response = await getWishlist();
       setWishlistItems(response.wishlistItems);
       console.log(response.wishlistItems, 'getWishiiee');
-      console.log(wishlistItems)
     } catch (error) {
       console.error('Error fetching cart data:', error);
+      toast({
+        title: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
   useEffect(() => {

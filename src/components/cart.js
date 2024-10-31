@@ -29,10 +29,11 @@ import {
   TabList,
   TabPanel,
   TabPanels,
+  useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { MdCheckCircle, MdLocationCity } from 'react-icons/md';
-import { getCart, removeFromCart } from '../actions/api';
+import { getCart, getCartTotal, removeFromCart } from '../actions/api';
 import { DeleteIcon } from '@chakra-ui/icons';
 
 const ShoppingCartDrawer = ({
@@ -41,6 +42,7 @@ const ShoppingCartDrawer = ({
 
 }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [cartTotal, setCartTotal] = useState(0);
   const [activeTab, setActiveTab] = useState(0); // 0 for phone number, 1 for address
   const [phoneNumber, setPhoneNumber] = useState('');
   const [name, setName] = useState('');
@@ -50,6 +52,7 @@ const ShoppingCartDrawer = ({
   const [pincode, setPincode] = useState('');
   const [isOrderModalOpen, setOrderModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const toast = useToast();
 
   const handleRemoveFromCart = async (itemId, color) => {
     console.log('itemif', itemId, color);
@@ -66,11 +69,17 @@ const ShoppingCartDrawer = ({
     try {
       const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
       const response = await getCart();
+      const response2 = await getCartTotal();
+      setCartTotal(response2.total);
       setCartItems(response.cartItems);
-      console.log(response.cartItems, 'getcartaaa');
-      console.log(cartItems)
     } catch (error) {
       console.error('Error fetching cart data:', error);
+      toast({
+        title: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
   useEffect(() => {
@@ -84,33 +93,12 @@ const ShoppingCartDrawer = ({
     setCurrentStep(currentStep + 1);
   };
 
+  // Function to handle the checkout process
   const handleCheckout = () => {
-    // Add logic for handling the checkout process
-    // You can show the order confirmation modal here
     setOrderModalOpen(true);
   };
   const handleTabChange = (index) => {
     setActiveTab(index);
-  };
-
-  const handlePhoneNumberChange = (e) => {
-    setPhoneNumber(e.target.value);
-  };
-
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-  };
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-  const handleAddressChange = (e) => {
-    setAddress(e.target.value);
-  };
-  const handleCityChange = (e) => {
-    setCity(e.target.value);
-  };
-  const handlePincodeChange = (e) => {
-    setPincode(e.target.value);
   };
 
   const handleDone = () => {
@@ -243,7 +231,7 @@ const ShoppingCartDrawer = ({
                   size="md"
                   mt={2}
                 >
-                  Proceed to Checkout
+                  Proceed to Checkout: ₹{cartTotal}
                 </Button>
               </Stack>
               <Modal
@@ -262,6 +250,7 @@ const ShoppingCartDrawer = ({
                             borderBottom: "2px solid black", // Change the bottom border color for the active tab
                             color: "black", // Change the text color for the active tab
                           }}
+                          onClick={() => setCurrentStep(0)}
                         >
                           1 Reciever Details
                         </Tab>
@@ -283,21 +272,21 @@ const ShoppingCartDrawer = ({
                               type="tel"
                               placeholder="Name"
                               value={name}
-                              onChange={handleNameChange}
+                              onChange={(e) => setName(e.target.value)}
                             />
                             <Text>Phone:</Text>
                             <Input
                               type="tel"
                               placeholder="Phone Number"
                               value={phoneNumber}
-                              onChange={handlePhoneNumberChange}
+                              onChange={(e) => setPhoneNumber(e.target.value)}
                             />
                             <Text>email:</Text>
                             <Input
                               type="tel"
                               placeholder="Email"
                               value={email}
-                              onChange={handleEmailChange}
+                              onChange={(e) => setEmail(e.target.value)}
                             />
                             {/* <Button
                     colorScheme="blue"
@@ -314,21 +303,21 @@ const ShoppingCartDrawer = ({
                               type="text"
                               placeholder="Enter Address"
                               value={address}
-                              onChange={handleAddressChange}
+                              onChange={(e) => setAddress(e.target.value)}
                             />
                             <Text>City:</Text>
                             <Input
                               type="text"
                               placeholder="Enter City"
                               value={city}
-                              onChange={handleCityChange}
+                              onChange={(e) => setCity(e.target.value)}
                             />
                             <Text>Pincode:</Text>
                             <Input
                               type="text"
                               placeholder="Enter Pincode"
                               value={pincode}
-                              onChange={handlePincodeChange}
+                              onChange={(e) => setPincode(e.target.value)}
                             />
                           </VStack>
                         </TabPanel>
@@ -342,6 +331,7 @@ const ShoppingCartDrawer = ({
                         _hover={{}}
                         color="white"
                         onClick={handleNextStep}
+                        isDisabled={!name || !phoneNumber || !email}
                       >
                         Next Step
                       </Button>
@@ -351,6 +341,7 @@ const ShoppingCartDrawer = ({
                         _hover={{}}
                         color="white"
                         onClick={handleDone}
+                        isDisabled={!address || !city || !pincode}
                       >
                         Done
                       </Button>

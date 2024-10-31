@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Box,
   Flex,
@@ -31,7 +31,16 @@ const Header = () => {
   const [isWishlistOpen, setWishlistOpen] = React.useState(false);
   const handleToggle = () => setIsOpen(!isOpen);
 
+  const navigate = useNavigate();
 
+  const handleClick = () => {
+    const email = localStorage.getItem('email');
+    if (email) {
+      navigate('/profile');  // Redirect to profile if email exists
+    } else {
+      navigate('/login');  // Redirect to login if email doesn't exist
+    }
+  };
 
   return (
     <Flex
@@ -61,7 +70,7 @@ const Header = () => {
           <DrawerOverlay>
             <DrawerContent>
               <DrawerCloseButton />
-              <Link to="/profile">
+              <Link to="/login">
                 <DrawerHeader>Login</DrawerHeader>
               </Link>
 
@@ -109,9 +118,7 @@ const Header = () => {
 
       <Box display={"flex"}>
         <IconButton icon={<Search2Icon fontSize="xl" />} variant="ghost" />
-        <Link to="/profile">
-          <IconButton icon={<FaUser fontSize="2xl" />} variant="ghost" />
-        </Link>
+        <IconButton onClick={handleClick} icon={<FaUser fontSize="2xl" />} variant="ghost" />
         <IconButton
           icon={<FaRegHeart fontSize="2xl" />}
           variant="ghost"
