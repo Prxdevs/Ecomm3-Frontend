@@ -84,7 +84,7 @@ const ProductDetails = () => {
     }
   };
 
-  const addToWishlist = async() => {
+  const addToWishlist = async () => {
     const response = await addToWishlistt(productId);
     console.log(response);
     setIsAddedToWishlist(true);

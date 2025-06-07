@@ -15,6 +15,7 @@ import Signup from './Pages/Signup.js';
 import Login from './Pages/Login.js';
 import Otp from './Pages/Otp.js';
 import Profile from './Pages/Profile.js';
+import Testing from './Pages/Testing.js';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/testing" element={<Testing />} />
         <Route path="/products/:categoryName" element={<FilteredProducts />} />
         <Route path="/about" element={<About />} />
         <Route path="/termsandcondition" element={<TermsAndCondition />} />

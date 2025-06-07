@@ -26,7 +26,7 @@ const FilteredProducts = () => {
   const fetchData = async () => {
     try {
       const response = await getAllProducts(categoryName, selectedColors);
-      setFilteredProducts(response);
+      setFilteredProducts(response.products);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -35,7 +35,7 @@ const FilteredProducts = () => {
   const colorData = async () => {
     try {
       const response = await getAllProducts(categoryName);
-      const colors = [...new Set(response.flatMap(product => product.variants.map(variant => variant.color)))];
+      const colors = [...new Set(response.products.flatMap(product => product.variants.map(variant => variant.color)))];
       setUniqueColors(colors);
     } catch (error) {
       console.error('Error fetching data:', error);

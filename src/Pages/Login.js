@@ -4,6 +4,7 @@ import "@fontsource/pt-sans";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getSingleUser, login, signup } from '../actions/api';
+import GoogleSignIn from './GoogleSignIn';
 
 const Login = () => {
 
@@ -19,8 +20,8 @@ const Login = () => {
 
     const handleLogin = async () => {
         try {
-            console.log('Login response:', email, password);
             const response = await login(email, password);
+            console.log('Login response:', email, password);
             if (response.success === true) {
                 toast({
                     title: 'Login Successful',
@@ -71,6 +72,7 @@ const Login = () => {
                         Not registered? Sign Up
                     </Text>
                 </Stack>
+                <GoogleSignIn/>
             </Box>
         </Container>
     );

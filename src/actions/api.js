@@ -49,6 +49,17 @@ export async function login(email, password) {
     }
 }
 
+export async function handleGoogleLogin(tokenId) {
+    try {
+        const response = await instance.post("/auth/registerOrLogin", {
+            tokenId
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export async function logout() {
     try {
         const response = await instance.post("/auth/logout");
@@ -76,13 +87,15 @@ export async function getAllCategories() {
     }
 }
 
-export async function getAllProducts(category, color, tags) {
+export async function getAllProducts(category, color, tags, page, itemsPerPage) {
     try {
         const response = await instance.get("/products", {
             params: {
                 category: category,
                 color: color,
-                tags: tags
+                tags: tags,
+                page: page,
+                itemsPerPage: itemsPerPage
             }
         });
         return response.data;
